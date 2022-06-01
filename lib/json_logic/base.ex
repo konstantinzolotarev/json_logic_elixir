@@ -97,7 +97,7 @@ defmodule JsonLogic.Base do
       Accepts logic and data arguments as Map
       Returns resolved result as Map
       """
-      @spec apply(Map.t(), Map.t()) :: Map.t()
+      @spec apply(map, map) :: map
       def apply(logic, data \\ nil)
 
       # operations selector branch of apply
