@@ -1,19 +1,40 @@
-defmodule CustomJsonLogic do
-  use JsonLogic
+defmodule CustomError do
+  defexception [:message]
+end
 
-  JsonLogic.add_operation("plus", __MODULE__, :plus)
+defmodule CustomJsonLogic do
+  use JsonLogic.Base,
+    operations: %{
+      "plus" => :plus,
+      "throw" => :throw
+    }
 
   def plus([a, b], _), do: a + b
+
+  def throw(data, _) do
+    raise CustomError, message: data
+  end
 end
 
 defmodule CustomJsonLogicTest do
   use ExUnit.Case
 
-  test "list of operations contains newly added `plus` function" do
-    assert {CustomJsonLogic, :plus} == Map.get(CustomJsonLogic.operations(), "plus")
-  end
-
   test "plus operation exist and works" do
     assert CustomJsonLogic.apply(%{"plus" => [2, 3]}) == 5
+  end
+
+  test "nested apply/2 should use custom operations as well" do
+    logic = %{
+      "if" => [
+        %{"===" => [%{"var" => "query.op"}, "get"]},
+        %{"throw" => "E_NOT_FOUND"}
+      ]
+    }
+
+    data = %{"query" => %{"op" => "get"}}
+
+    assert_raise CustomError, fn ->
+      CustomJsonLogic.apply(logic, data)
+    end
   end
 end
