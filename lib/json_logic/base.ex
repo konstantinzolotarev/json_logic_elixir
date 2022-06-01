@@ -97,7 +97,7 @@ defmodule JsonLogic.Base do
       Accepts logic and data arguments as Map
       Returns resolved result as Map
       """
-      @spec apply(map, map) :: map
+      @spec apply(term, term) :: term
       def apply(logic, data \\ nil)
 
       # operations selector branch of apply
@@ -528,7 +528,7 @@ defmodule JsonLogic.Base do
 
       @doc false
       def operation_cat(strings, data) when is_list(strings) do
-        strings |> Enum.map(fn s -> __MODULE__.apply(s, data) end) |> Enum.join()
+        strings |> Enum.map_join(fn s -> __MODULE__.apply(s, data) end)
       end
 
       def operation_cat(string, data) do
